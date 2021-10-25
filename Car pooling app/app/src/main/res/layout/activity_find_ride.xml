@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_find_ride"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/orange"
+
+    tools:context="com.takeme.tm.FindRide">
+    <TimePicker
+        android:id="@+id/timePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleX="0.60"
+        android:scaleY="0.60"
+
+        />
+
+
+    <EditText
+        android:id= "@+id/src"
+        android:layout_width="175dp"
+        android:layout_height="40dp"
+        android:hint="Enter starting place"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="Enter destination"
+        android:id="@+id/dest"
+        android:layout_marginRight="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_alignBottom="@+id/src"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SET PREFERENCES"
+        android:background="@color/yellow"
+
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp" />
+
+    <EditText
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tt"
+        android:layout_below="@+id/timePicker"
+        android:layout_alignLeft="@+id/submit"
+        android:layout_alignStart="@+id/submit" />
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SET"
+        android:background="@color/yellow"
+
+        android:layout_below="@+id/timePicker"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/st"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text ="TIME"
+        android:textSize="25dp"
+        android:layout_alignBottom="@+id/tt"
+        android:layout_toLeftOf="@+id/tt"
+        android:layout_toStartOf="@+id/tt"
+        android:layout_marginRight="25dp"
+        android:layout_marginEnd="25dp" />
+
+
+</RelativeLayout>
