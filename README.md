@@ -7,91 +7,50 @@ Developed a feedback and preference system for drivers and matched the customers
 
 
 import json
-import os
-from deepdiff import DeepDiff
-from yattag import Doc, indent
-from weasyprint import HTML
+from rich.console import Console
+from rich.table import Table
 
-# Function to generate the HTML report for a pair of JSON files
-def generate_html_report(file1_name, file2_name, diff):
-    doc, tag, text = Doc().tagtext()
-    
-    with tag('table', klass='diff-table'):
-        with tag('tr'):
-            with tag('th'):
-                text(file1_name)
-            with tag('th'):
-                text(file2_name)
+def compare_json(json1, json2):
+    # Initialize the console
+    console = Console()
 
-        # Loop over the differences
-        for diff_type, changes in diff.items():
-            for change in changes:
-                with tag('tr'):
-                    if diff_type == 'dictionary_item_added':
-                        with tag('td', klass='diff-addition'):
-                            text(f"Added: {change.path()}")
-                        with tag('td', klass='diff-addition'):
-                            text(f"Value: {json.dumps(change.t2, indent=4)}")
-                    elif diff_type == 'dictionary_item_removed':
-                        with tag('td', klass='diff-deletion'):
-                            text(f"Removed: {change.path()}")
-                        with tag('td', klass='diff-deletion'):
-                            text(f"Value: {json.dumps(change.t1, indent=4)}")
-                    elif diff_type == 'values_changed':
-                        with tag('td', klass='diff-deletion'):
-                            text(f"Old: {json.dumps(change.t1, indent=4)}")
-                        with tag('td', klass='diff-addition'):
-                            text(f"New: {json.dumps(change.t2, indent=4)}")
+    # Create a table for side-by-side comparison
+    table = Table(title="JSON Comparison", show_header=True, header_style="bold magenta")
+    table.add_column("Key", justify="left", style="cyan", no_wrap=True)
+    table.add_column("JSON1", justify="left", style="green")
+    table.add_column("JSON2", justify="left", style="red")
 
-    # Return the HTML content for this comparison
-    return indent(doc.getvalue())
+    # Collect keys from both JSONs
+    all_keys = set(json1.keys()).union(set(json2.keys()))
 
-# Directory containing the JSON files
-json_directory = 'path_to_your_json_files'
+    for key in all_keys:
+        value1 = json1.get(key, "[Missing]")
+        value2 = json2.get(key, "[Missing]")
 
-# List all JSON files in the directory
-json_files = [f for f in os.listdir(json_directory) if f.endswith('.json')]
+        if isinstance(value1, list) and isinstance(value2, list):
+            diff1 = set(value1) - set(value2)
+            diff2 = set(value2) - set(value1)
+            value1 = f"[{', '.join(diff1)}]" if diff1 else "[Same]"
+            value2 = f"[{', '.join(diff2)}]" if diff2 else "[Same]"
+        elif value1 != value2:
+            if value1 == "[Missing]":
+                value1 = "[Missing]"
+            if value2 == "[Missing]":
+                value2 = "[Missing]"
+        else:
+            value1 = value2 = "[Same]"
 
-# Initialize a document to accumulate all HTML content
-doc, tag, text = Doc().tagtext()
+        table.add_row(key, str(value1), str(value2))
 
-with tag('html'):
-    with tag('head'):
-        doc.stag('meta', charset="utf-8")
-        with tag('style'):
-            text('''
-                .diff-table { width: 100%; border-collapse: collapse; }
-                .diff-table td { padding: 8px; border: 1px solid #ccc; }
-                .diff-addition { background-color: #eaffea; }
-                .diff-deletion { background-color: #ffecec; }
-            ''')
-    with tag('body'):
-        # Compare each pair of JSON files and accumulate the HTML content
-        for i in range(len(json_files)):
-            for j in range(i + 1, len(json_files)):
-                file1_name = json_files[i]
-                file2_name = json_files[j]
-                
-                # Load the JSON files
-                with open(os.path.join(json_directory, file1_name)) as f1, open(os.path.join(json_directory, file2_name)) as f2:
-                    json1 = json.load(f1)
-                    json2 = json.load(f2)
-                
-                # Compare the JSON objects
-                diff = DeepDiff(json1, json2, view='tree')
-                
-                # Generate the HTML content for this pair of files
-                comparison_html = generate_html_report(file1_name, file2_name, diff)
-                
-                # Add a section header for this comparison
-                with tag('h2'):
-                    text(f'Comparison between {file1_name} and {file2_name}')
-                
-                # Add the comparison HTML to the document
-                doc.asis(comparison_html)
+    # Display the table
+    console.print(table)
 
-# Convert the accumulated HTML content to a single PDF
-html_content = indent(doc.getvalue())
-HTML(string=html_content).write_pdf('all_comparisons.pdf')
+# Load the JSON files
+with open('json1.json', 'r') as file:
+    json1 = json.load(file)
 
-print('All comparisons have been saved to all_comparisons.pdf')
+with open('json2.json', 'r') as file:
+    json2 = json.load(file)
+
+# Compare the JSON files and display the differences
+compare_json(json1, json2)
